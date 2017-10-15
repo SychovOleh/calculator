@@ -1,0 +1,36 @@
+.calc {
+  width: $main-width;
+  margin: 0 auto;
+  padding: 10px 0;
+  font-size: 0;
+  &__screen {
+    box-sizing: border-box;
+    font-size: 32px;
+    width: 261px;
+    resize: none;
+    padding: 8px 4px;
+    &:focus {
+      outline: 0;
+    }
+  }
+  &__keyboard {
+    width: $main-width;
+    border-right: $border-char;
+    border-bottom: $border-char;
+  }
+  &__btn {
+    @extend .btn;
+    &-number {
+      background-color: $back-color-num;
+    }
+    &-operator {
+      background-color: $back-color-operator;
+    }
+    &-reset {
+      background-color: $back-color-reset;
+    }
+    &.long {
+      width: $btn-width*2;
+    }
+  }
+}

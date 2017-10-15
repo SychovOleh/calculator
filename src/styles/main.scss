@@ -1,0 +1,35 @@
+@import "partial/reset.scss";
+// 
+$back-color-num: #F0F0F0;
+$back-color-operator: #e0e0e0;
+$back-color-reset: #fd9621;
+$back-color-active: grey;
+$border-color: #868686;
+$border-char: 1px solid $border-color;
+$btn-height: 50px;
+$btn-width: 65px;
+$main-width: $btn-width*4;
+// 
+.body {
+  padding: 10px;
+}
+
+.btn {
+  height: $btn-height;
+  width: $btn-width;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 29px;
+  padding: 0;
+  border: none;
+  border-top: $border-char;
+  border-left: $border-char;
+  &:focus {
+    outline: none;
+  }
+  &:active {
+    background-color: $back-color-active;
+  }
+}
+
+// 
+@import "partial/calc.scss";

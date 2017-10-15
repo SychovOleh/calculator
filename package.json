@@ -1,0 +1,22 @@
+{
+  "name": "sass-example",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Oleh Sychov <sychovoleh@gmail.com>",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {
+    "babel-cli": "*",
+    "babel-preset-env": "*",
+    "gulp": "*",
+    "gulp-autoprefixer": "*",
+    "gulp-babel": "*",
+    "gulp-clean": "^0.3.2",
+    "gulp-sass": "*",
+    "gulp-uglify": "^3.0.0"
+  },
+  "description": ""
+}
