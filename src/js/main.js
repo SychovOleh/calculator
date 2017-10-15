@@ -55,11 +55,12 @@ class Calc {
     this.openBracketsCount = target.value.replace(/[^\(]/g, '').length;
     this.closeBracketsCount = target.value.replace(/[^\)]/g, '').length;
 
-    const bugSolvingRegExp = /[-\+\*\/][-\+\*\/]|-\)|^[-\+\*\/]/;
+    const bugSolvingRegExp = /[-\+\*\/][-\+\*\/]|-\)|^[-\+\*\/]|\d\(/;
     if (this.closeBracketsCount > this.openBracketsCount || bugSolvingRegExp.test(target.value)) {
       target.value = this.prevInputExpression;
       return
     }
+
 
     this.calcExprObj.value = target.value;
     this.prevInputExpression = target.value;
