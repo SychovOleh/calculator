@@ -2,3 +2,5 @@
 /node_modules/
 /build/
 /resource/
+/.vscode/
+package-lock.json
