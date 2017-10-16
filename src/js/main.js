@@ -48,11 +48,11 @@ class Calc {
   }
 
   keyboardToScreen(event) {
-    if (event.type !== 'keydown') {
+    const isKeyDown = event.type === 'keydown';
+
+    if (!isKeyDown) {
       var button = event.target.textContent;
     } else if (!(event.keyCode === 13 || event.keyCode === 27)) return;
-
-    const isKeyDown = event.type === 'keydown';
 
     if (isKeyDown) event.preventDefault();
 
