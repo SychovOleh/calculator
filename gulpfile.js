@@ -29,10 +29,3 @@ gulp.task('watch', ['sass', 'scripts'], function() {
   gulp.watch('./src/styles/**/*.scss', ['sass']);
   gulp.watch('./src/js/**/*.js', ['scripts']);
 });
-
-// gulp.task('clean', function() {
-//   return gulp.src('./dist', { read: false })
-//     .pipe(clean());
-// });
-
-// gulp.task('default', ['clean', 'sass', 'scripts'], function() {});

@@ -1,115 +1,159 @@
-//** I didn't use React for this project because our View rendering really small for React and we would have only 3 Components.  */
-//** And didn't use MVC cause Model component would have only one preoperty (input data). */
-
-//** I divided all methods to two parts - Parser methods (Controller), View methods, and two methods in {constructer} */
-//** for connecting View and Parser => {mapToParser}, {mapResultToView} */
-
+//** I divided all methods to three parts - Verification methods (first Controller), Parser methods (second Controller), */
+//** View methods, and two methods in {constructor} for connecting View and Parser => {mapToParser}, {mapResultToView} */
+//** Store (Model) has connection with (Controller) only*/ 
 
 class Calc {
   constructor() {
+    //** STORE */ 
+    this.calcStore = { inputVal: '', prevInputVal: '' }; //** main input result */
+
+
+    //** View variables */ 
     this.calcScreen = document.querySelector('.calc__screen');
     this.calcBoard = document.querySelector('.calc__keyboard');
 
-    this.calcExprObj = { value: '' }; //** main input result */
 
-    //** listeners variables */ 
-    this.prevInputExpression = '';
+    //** way from View to Parser */
+    this.mapToParser = () => this.bracketParser(this.calcStore);
+    //** way from Parser to View */
+    this.mapResultToView = (result) => this.viewResult(result, this.calcScreen);
+
+
+    //** Verification variables */ 
     this.openBracketsCount;
     this.closeBracketsCount;
-    this.checkSymbolsRegExp = /[^-\d\+\(\)\*\/]/g;
-    this.checkExpressionRegExp = /^(\(*-?\d+\)*[-\+\*\/]{1}\(*-?)+$|^(\(*-?\d+\)*[-\+\*\/]{1}\(*-?)+$|^(\(*-?\d+\)*[-\+\*\/]{1}\(*-?)+\(*-?\d+\)*$|^\(*-?\d+\)*$|\(*\d*/;
-    this.checkBeforeInitCalcRegExp = /\d+\D+\d+/;
+    this.replaceRegExp = /[^-\d\+\(\)\*\/]/g;
+    this.fullStringVerificationRegExp = /^(\(*-?\d+\)*[-\+\*\/]{1}\(*-?)+$|^(\(*-?\d+\)*[-\+\*\/]{1}\(*-?)+$|^(\(*-?\d+\)*[-\+\*\/]{1}\(*-?)+\(*-?\d+\)*$|^\(*-?\d+\)*$|\(*\d*/;
+    this.piecesOfStringRegExp = /[-\+\*\/][-\+\*\/]|-\)|^[-\+\*\/]|\d\(/;
+    this.emptyBracketsRegExp = /\(\)/;
+    this.oneNumInBracketsRegExp = /\(\_\d+\)/;
 
-    this.calcScreen.oninput = () => this.checkInput();
-    this.calcScreen.addEventListener('paste', this.checkInput.bind(this))
-    this.calcScreen.addEventListener('cut', this.checkInput.bind(this))
-    this.calcBoard.addEventListener('click', this.keyboardToScreen.bind(this))
-    document.addEventListener('keydown', this.keyboardToScreen.bind(this))
-
-
-    this.mapToParser = (calcExprObj) => this.bracketParser(calcExprObj) //** way from View to Parser */
-    this.mapResultToView = (result) => this.viewResult(result, this.calcScreen) //** way from Parser to View */
-
-    //** parser variables */ 
+    //** Parser variables */ 
     this.avoidBracketsRegExp = /[^0-9_]/;
     this.operatorsPreorityCurve = [/[*\/]/, /[+-]/];
     this.bracketOpenIndex;
     this.bracketCloseIndex;
+
+
+    this.calcScreen.oninput = () => this.viewInputVerification();
+    this.calcScreen.addEventListener('paste', this.viewInputVerification.bind(this))
+    this.calcScreen.addEventListener('cut', this.viewInputVerification.bind(this))
+    this.calcBoard.addEventListener('click', this.keyboardToScreen.bind(this))
+    document.addEventListener('keydown', this.keyboardToScreen.bind(this))
   }
 
-  //**view metods */
-  checkInput() {
-    const target = this.calcScreen;
-    const newVal = target.value.replace(this.checkSymbolsRegExp, '') //** if paste => delete all excess symbols */
-
-    if (target.value !== newVal) target.value = newVal;
-    if (target.value.length < 1) return;
-
-    const isExprCanCalculate = this.checkExpressionRegExp.test(target.value);
-
-    if (!isExprCanCalculate) {
-      target.value = this.prevInputExpression;
-      return
-    }
-
-    this.openBracketsCount = target.value.replace(/[^\(]/g, '').length;
-    this.closeBracketsCount = target.value.replace(/[^\)]/g, '').length;
-
-    const bugSolvingRegExp = /[-\+\*\/][-\+\*\/]|-\)|^[-\+\*\/]|\d\(/;
-    if (this.closeBracketsCount > this.openBracketsCount || bugSolvingRegExp.test(target.value)) {
-      target.value = this.prevInputExpression;
-      return
-    }
-
-
-    this.calcExprObj.value = target.value;
-    this.prevInputExpression = target.value;
+  //** View metods */
+  viewResult(result, inputPlace) {
+    inputPlace.value = result;
   }
 
   keyboardToScreen(event) {
     if (event.type !== 'keydown') {
-      var text = event.target.textContent;
+      var button = event.target.textContent;
     } else if (!(event.keyCode === 13 || event.keyCode === 27)) return;
 
     const isKeyDown = event.type === 'keydown';
 
     if (isKeyDown) event.preventDefault();
 
-    if ((isKeyDown && event.keyCode === 13) || text === '=') {
-      if (this.changeForCalculating(this.calcExprObj)) this.mapToParser(this.calcExprObj)
+    if ((isKeyDown && event.keyCode === 13) || button === '=') {
+      this.viewInputVerification(true)
       return
     }
 
-    text === 'c' || event.keyCode === 27 ? this.calcScreen.value = '' : this.calcScreen.value = this.calcScreen.value + text;
+    if (button === 'c' || event.keyCode === 27) {
+      this.calcScreen.value = '';
+      return
+    }
 
-    this.checkInput(this.calcExprObj)
+    this.calcScreen.value = this.calcScreen.value + button;
+    this.viewInputVerification()
   }
 
-  changeForCalculating(calcExprObj) {
-    if (!this.checkBeforeInitCalcRegExp.test(calcExprObj.value)) return;
+  viewInputVerification(isResultVerification) {
+    const target = this.calcScreen;
 
-    const emptyBracketsRegExp = /\(\)/;
-    calcExprObj.value = calcExprObj.value.replace(emptyBracketsRegExp, '')
+    if (isResultVerification) {
+      // const canCalc = this.verificateBeforeCalc(target.value);
+
+      // if (canCalc) return alert('Please, reload page for Calculator normal working')
+
+      this.prepareBeforeCalc(target.value)
+      this.mapToParser()
+    }
+
+    target.value = this.replaceExcessSymbols(target.value);
+
+    if (target.value.length < 1) return
+
+    let isPrevResObj = { result: false }
+    target.value = this.mainVerification(target.value, isPrevResObj);
+
+    if (isPrevResObj.result) return;
+
+    target.value = this.piecesVerification(target.value);
+  }
+
+
+  //** Verification methods */
+  prepareBeforeCalc(value, emptyBracketsRule = this.emptyBracketsRegExp, oneNegativeNumRule = this.oneNumInBracketsRegExp) {
+    value = value.replace(emptyBracketsRule, '')
 
     const bracketsCountDiffer = this.openBracketsCount - this.closeBracketsCount;
 
     if (bracketsCountDiffer > 0) {
       for (let i = 0; i < bracketsCountDiffer; i += 1) {
-        calcExprObj.value += ')'
+        value += ')'
       }
     }
 
-    calcExprObj.value = calcExprObj.value.replace('(-', '(_'); //** for parser understanding where are negative numbers */
+    value = value.replace(/\(\-/g, '(_'); //** for parser understanding where are negative numbers */
 
-    return true;
+    let oneNegativeNumInBrackets = oneNegativeNumRule.exec(value);
+
+    while (oneNegativeNumInBrackets !== null) {
+      const firstIndex = oneNegativeNumInBrackets['index'];
+      const lastIndex = value.indexOf(')', firstIndex);
+
+      let firstPartValue = value.substring(0, firstIndex);
+      let negativeNum = value.substring(firstIndex + 1, lastIndex);
+      let lastPartValue = value.substring(lastIndex + 1, value.length)
+      negativeNum = negativeNum.replace(')')
+      negativeNum = negativeNum.replace('(')
+
+      value = firstPartValue + negativeNum + lastPartValue
+      oneNegativeNumInBrackets = oneNegativeNumRule.exec(value);
+    }
+    this.calcStore.inputVal = value;
   }
 
-  viewResult(result, inputPlace) {
-    inputPlace.value = result;
+  replaceExcessSymbols(value, replaceRule = this.replaceRegExp) {
+    return value.replace(replaceRule, '') //** if paste  */    
   }
 
+  mainVerification(value, isPrevResObj, verificationRule = this.fullStringVerificationRegExp) {
+    const isVerified = verificationRule.test(value);
 
+    if (!isVerified) {
+      isPrevResObj.result = true;
+      return this.calcStore.prevInputVal
+    }
 
+    return value
+  }
+
+  piecesVerification(value, smallVerification = this.piecesOfStringRegExp) {
+    this.openBracketsCount = value.replace(/[^\(]/g, '').length;
+    this.closeBracketsCount = value.replace(/[^\)]/g, '').length;
+
+    if (this.closeBracketsCount > this.openBracketsCount || smallVerification.test(value)) {
+      return this.calcStore.prevInputVal
+    }
+
+    this.calcStore.prevInputVal = value;
+    this.calcStore.inputVal = value;
+    return value;
+  }
 
 
   //** PARSER METHODS */ 
@@ -122,16 +166,16 @@ class Calc {
       //** negative number in bracketParser is figured out like '_Number' */
       resNum > 0 ? numAsString = resNum + '' : numAsString = `_${Math.abs(resNum)}`;
 
-      this.calcExprObj.value = this.replaceBracketExprToNum(this.calcExprObj.value, expression, numAsString);
+      this.calcStore.inputVal = this.replaceBracketExprToNum(this.calcStore.inputVal, expression, numAsString);
       return
     }
 
     this.mapResultToView(resNum)
   }
 
-  bracketParser(calcExprObj) {
+  bracketParser(calcStore) {
     while (true) {
-      const calcString = calcExprObj.value
+      const calcString = calcStore.inputVal
 
       this.bracketCloseIndex = calcString.indexOf(')');
 
