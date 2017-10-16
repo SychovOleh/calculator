@@ -83,9 +83,7 @@ class Calc {
 
     target.value = this.replaceExcessSymbols(target.value);
 
-    if (target.value.length < 1) {
-      return
-    }
+    if (target.value.length < 1) return;
 
     let isPrevResObj = { result: false }
     target.value = this.mainVerification(target.value, isPrevResObj);
