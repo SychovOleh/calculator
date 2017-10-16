@@ -110,10 +110,8 @@ class Calc {
 
     const bracketsCountDiffer = this.openBracketsCount - this.closeBracketsCount;
 
-    if (bracketsCountDiffer > 0) {
-      for (let i = 0; i < bracketsCountDiffer; i += 1) {
-        value += ')'
-      }
+    for (let i = 0; i < bracketsCountDiffer; i += 1) {
+      value += ')'
     }
 
     /** for parser understanding where are negative numbers */
