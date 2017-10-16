@@ -30,7 +30,7 @@ class Calc {
 
     //** Parser variables */ 
     this.avoidBracketsRegExp = /[^0-9_]/;
-    this.operatorsPreorityCurve = [/[*\/]/, /[+-]/];
+    this.operatorsPreorityCurve = [/[\*\/]/, /[\+\-]/];
     this.bracketOpenIndex;
     this.bracketCloseIndex;
 
@@ -80,6 +80,7 @@ class Calc {
 
       this.prepareBeforeCalc(target.value)
       this.mapToParser()
+      return;
     }
 
     target.value = this.replaceExcessSymbols(target.value);
@@ -118,8 +119,7 @@ class Calc {
       let firstPartValue = value.substring(0, firstIndex);
       let negativeNum = value.substring(firstIndex + 1, lastIndex);
       let lastPartValue = value.substring(lastIndex + 1, value.length)
-      negativeNum = negativeNum.replace(')')
-      negativeNum = negativeNum.replace('(')
+      negativeNum = negativeNum.replace(/[\(\)]/g, '')
 
       value = firstPartValue + negativeNum + lastPartValue
       oneNegativeNumInBrackets = oneNegativeNumRule.exec(value);
