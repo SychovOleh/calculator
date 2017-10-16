@@ -74,10 +74,6 @@ class Calc {
     const target = this.calcScreen;
 
     if (isResultVerification) {
-      // const canCalc = this.verificateBeforeCalc(target.value);
-
-      // if (canCalc) return alert('Please, reload page for Calculator normal working')
-
       this.prepareBeforeCalc(target.value)
       this.mapToParser()
       return;
@@ -124,6 +120,7 @@ class Calc {
       value = firstPartValue + negativeNum + lastPartValue
       oneNegativeNumInBrackets = oneNegativeNumRule.exec(value);
     }
+    
     this.calcStore.inputVal = value;
   }
 
