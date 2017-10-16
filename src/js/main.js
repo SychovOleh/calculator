@@ -21,6 +21,7 @@ class Calc {
     this.mapResultToView = (result) => this.viewResult(result, this.calcScreen);
 
 
+
     /** Verification variables */
     this.openBracketsCount;
     this.closeBracketsCount;
@@ -60,6 +61,7 @@ class Calc {
 
     if (button === 'c' || event.keyCode === ESC_KEYCODE) {
       this.calcScreen.value = '';
+      this.clearStoreFromView()
       return
     } else if (button === '=' || event.keyCode === ENTER_KEYCODE) {
       this.viewInputVerification(true)
@@ -94,7 +96,13 @@ class Calc {
   }
 
 
-  //** Verification methods */
+  /** Verification methods */
+  clearStoreFromView(store = this.calcStore) {
+    for (let key in store) {
+      store[key] = '';
+    }
+  }
+
   prepareBeforeParse(value, emptyBracketsRule = this.emptyBracketsRegExp, oneNegativeNumRule = this.oneNumInBracketsRegExp) {
     /** This method delets all brackets those empty, adds close brackets if they did not add while */
     /** typing, changs negative symbol for parser better understandig and delets brackets */
@@ -132,7 +140,8 @@ class Calc {
   }
 
   replaceExcessSymbols(value, replaceRule = this.replaceRegExp) {
-    const res = value.replace(replaceRule, '') //** if paste  */
+    /** if is pasted with keyboard */
+    const res = value.replace(replaceRule, '')
     if (res.length < 1) this.calcStore.prevInputVal = '';
     return res
   }
