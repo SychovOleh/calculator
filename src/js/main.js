@@ -1,25 +1,27 @@
-//** I divided all methods to three parts - Verification methods (first Controller), Parser methods (second Controller), */
-//** View methods, and two methods in {constructor} for connecting View and Parser => {mapToParser}, {mapResultToView} */
-//** Store (Model) has connection with (Controller) only*/ 
+/** I divided all methods to three parts - Verification methods (first Controller), Parser methods (second Controller), */
+/** View methods, and two methods in {constructor} for connecting View and Parser => {mapToParser}, {mapResultToView} */
+/** Store (Model) has connection with (Controller) only*/
+const ENTER_KEYCODE = 13;
+const ESC_KEYCODE = 27;
 
 class Calc {
   constructor() {
-    //** STORE */ 
+    /** STORE */
     this.calcStore = { inputVal: '', prevInputVal: '' };
 
 
-    //** View variables */ 
+    /** View variables */
     this.calcScreen = document.querySelector('.calc__screen');
     this.calcBoard = document.querySelector('.calc__keyboard');
 
 
-    //** way from View to Parser */
+    /** way from View to Parser */
     this.mapToParser = () => this.bracketParser(this.calcStore);
-    //** way from Parser to View */
+    /** way from Parser to View */
     this.mapResultToView = (result) => this.viewResult(result, this.calcScreen);
 
 
-    //** Verification variables */ 
+    /** Verification variables */
     this.openBracketsCount;
     this.closeBracketsCount;
     this.replaceRegExp = /[^-\d\+\(\)\*\/]/g;
@@ -28,7 +30,7 @@ class Calc {
     this.emptyBracketsRegExp = /\(\)/;
     this.oneNumInBracketsRegExp = /\(\_\d+\)/;
 
-    //** Parser variables */ 
+    /** Parser variables */
     this.avoidBracketsRegExp = /[^0-9_]/;
     this.operatorsPreorityCurve = [/[\*\/]/, /[\+\-]/];
     this.bracketOpenIndex;
@@ -42,7 +44,7 @@ class Calc {
     document.addEventListener('keydown', this.keyboardToScreen.bind(this))
   }
 
-  //** View metods */
+  /** View metods */
   viewResult(result, inputPlace) {
     inputPlace.value = result;
   }
@@ -52,17 +54,15 @@ class Calc {
 
     if (!isKeyDown) {
       var button = event.target.textContent;
-    } else if (!(event.keyCode === 13 || event.keyCode === 27)) return;
+    } else if (!(event.keyCode === ENTER_KEYCODE || event.keyCode === ESC_KEYCODE)) return;
 
     if (isKeyDown) event.preventDefault();
 
-    if ((isKeyDown && event.keyCode === 13) || button === '=') {
-      this.viewInputVerification(true)
-      return
-    }
-
-    if (button === 'c' || event.keyCode === 27) {
+    if (button === 'c' || event.keyCode === ESC_KEYCODE) {
       this.calcScreen.value = '';
+      return
+    } else if (button === '=' || event.keyCode === ENTER_KEYCODE) {
+      this.viewInputVerification(true)
       return
     }
 
@@ -74,7 +74,7 @@ class Calc {
     const target = this.calcScreen;
 
     if (isResultVerification) {
-      this.prepareBeforeCalc(target.value)
+      this.prepareBeforeParse(target.value)
       this.mapToParser()
       return;
     }
@@ -95,7 +95,11 @@ class Calc {
 
 
   //** Verification methods */
-  prepareBeforeCalc(value, emptyBracketsRule = this.emptyBracketsRegExp, oneNegativeNumRule = this.oneNumInBracketsRegExp) {
+  prepareBeforeParse(value, emptyBracketsRule = this.emptyBracketsRegExp, oneNegativeNumRule = this.oneNumInBracketsRegExp) {
+    /** This method delets all brackets those empty, adds close brackets if they did not add while */
+    /** typing, changs negative symbol for parser better understandig and delets brackets */
+    /** around of negative number */
+
     value = value.replace(emptyBracketsRule, '')
 
     const bracketsCountDiffer = this.openBracketsCount - this.closeBracketsCount;
@@ -106,7 +110,8 @@ class Calc {
       }
     }
 
-    value = value.replace(/\(\-/g, '(_'); //** for parser understanding where are negative numbers */
+    /** for parser understanding where are negative numbers */
+    value = value.replace(/\(\-/g, '(_');
 
     let oneNegativeNumInBrackets = oneNegativeNumRule.exec(value);
 
@@ -157,14 +162,14 @@ class Calc {
   }
 
 
-  //** PARSER METHODS */ 
+  /** PARSER METHODS */
   connectBracketExprToResult(expression, isIntermediateResult) {
     let arrExprNow = this.cutStringToArrayExpr(expression);
     const resNum = this.parseCalc(arrExprNow)
     let numAsString;
 
     if (isIntermediateResult) {
-      //** negative number in bracketParser is figured out like '_Number' */
+      /** negative number in bracketParser is figured out like '_Number' */
       resNum > 0 ? numAsString = resNum + '' : numAsString = `_${Math.abs(resNum)}`;
 
       this.calcStore.inputVal = this.replaceBracketExprToNum(this.calcStore.inputVal, expression, numAsString);
@@ -201,7 +206,7 @@ class Calc {
     while (true) {
       const stringInfo = calcString.match(this.avoidBracketsRegExp);
 
-      if (stringInfo === null) { //**last element lost (only operand) */
+      if (stringInfo === null) { /** last element lost (only operand) */
         result.push(parseInt(calcString.replace('_', '-'), 10));
         return result
       }
@@ -227,9 +232,9 @@ class Calc {
         const resNow = this.initMathExpr(prevNum, operator, nextNum);
         arrOfExpressions.splice(i - 1, 3, resNow)
 
-        i -= 1; //**three array elements turned into one in this line. And for following in next */
-        //** iteration to next array element we need turn back to previous array element. I didn't */
-        //** use forEach because we can't do this step in functionals loop */
+        i -= 1; /**three array elements turned into one in this line. And for following in next */
+        /** iteration to next array element we need turn back to previous array element. I didn't */
+        /** use forEach because we can't do this step in functionals loop */
       }
     })
 
