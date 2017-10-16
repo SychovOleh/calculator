@@ -5,7 +5,7 @@
 class Calc {
   constructor() {
     //** STORE */ 
-    this.calcStore = { inputVal: '', prevInputVal: '' }; //** main input result */
+    this.calcStore = { inputVal: '', prevInputVal: '' };
 
 
     //** View variables */ 
@@ -81,7 +81,9 @@ class Calc {
 
     target.value = this.replaceExcessSymbols(target.value);
 
-    if (target.value.length < 1) return
+    if (target.value.length < 1) {
+      return
+    }
 
     let isPrevResObj = { result: false }
     target.value = this.mainVerification(target.value, isPrevResObj);
@@ -120,12 +122,14 @@ class Calc {
       value = firstPartValue + negativeNum + lastPartValue
       oneNegativeNumInBrackets = oneNegativeNumRule.exec(value);
     }
-    
+
     this.calcStore.inputVal = value;
   }
 
   replaceExcessSymbols(value, replaceRule = this.replaceRegExp) {
-    return value.replace(replaceRule, '') //** if paste  */    
+    const res = value.replace(replaceRule, '') //** if paste  */
+    if (res.length < 1) this.calcStore.prevInputVal = '';
+    return res
   }
 
   mainVerification(value, isPrevResObj, verificationRule = this.fullStringVerificationRegExp) {
