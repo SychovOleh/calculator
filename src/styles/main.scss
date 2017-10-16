@@ -17,6 +17,7 @@ $main-width: $btn-width*4;
 .for-text {
   text-align: center;
   max-width: 400px;
+  margin: 0 auto;
 }
 
 .title {
@@ -24,7 +25,8 @@ $main-width: $btn-width*4;
   font-size: 22px;
   padding-bottom: 10px;
 }
-.after{
+
+.after {
   @extend .for-text;
   font-size: 14px;
 }
