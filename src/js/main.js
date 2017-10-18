@@ -75,7 +75,7 @@ class Calc {
   viewInputVerification(isResultVerification) {
     const target = this.calcScreen;
 
-    if (isResultVerification) {
+    if (event.type !== 'paste' && isResultVerification) {
       this.prepareBeforeParse(target.value)
       this.mapToParser()
       return;
@@ -123,10 +123,9 @@ class Calc {
       const firstIndex = oneNegativeNumInBrackets['index'];
       const lastIndex = value.indexOf(')', firstIndex);
 
-      let firstPartValue = value.substring(0, firstIndex);
-      let negativeNum = value.substring(firstIndex + 1, lastIndex);
-      let lastPartValue = value.substring(lastIndex + 1, value.length)
-      negativeNum = negativeNum.replace(/[\(\)]/g, '')
+      const firstPartValue = value.substring(0, firstIndex);
+      const negativeNum = value.substring(firstIndex + 1, lastIndex);
+      const lastPartValue = value.substring(lastIndex + 1, value.length)
 
       value = firstPartValue + negativeNum + lastPartValue
       oneNegativeNumInBrackets = oneNegativeNumRule.exec(value);
@@ -167,7 +166,7 @@ class Calc {
   }
 
 
-  /** PARSER METHODS */
+  /** Parser Mothods */
   connectBracketExprToResult(expression, isIntermediateResult) {
     let arrExprNow = this.cutStringToArrayExpr(expression);
     const resNum = this.parseCalc(arrExprNow)
