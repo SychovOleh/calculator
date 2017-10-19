@@ -152,11 +152,11 @@ class Calc {
     return value
   }
 
-  piecesVerification(value, smallVerification = this.piecesOfStringRegExp) {
+  piecesVerification(value, smallVerificationRule = this.piecesOfStringRegExp) {
     this.openBracketsCount = value.replace(/[^\(]/g, '').length;
     this.closeBracketsCount = value.replace(/[^\)]/g, '').length;
 
-    if (this.closeBracketsCount > this.openBracketsCount || smallVerification.test(value)) {
+    if (this.closeBracketsCount > this.openBracketsCount || smallVerificationRule.test(value)) {
       return this.calcStore.prevInputVal
     }
 
